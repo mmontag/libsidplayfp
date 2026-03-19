@@ -24,6 +24,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <algorithm>
 
 #include "sidemu.h"
 
@@ -53,6 +54,11 @@ void Mixer::doMix()
     const int sampleCount = m_chips.front()->bufferpos();
 
     int i = 0;
+    if (!m_sampleBuffer)
+    {
+        i = std::min(sampleCount, int(m_sampleCount - m_sampleIndex));
+        m_sampleIndex += i;
+    }
     while (
         (i < sampleCount) &&
         (m_sampleIndex < m_sampleCount) &&      // Handle whatever output the sid has generated so far
@@ -111,6 +117,8 @@ void Mixer::begin(short *buffer, uint_least32_t count)
     m_sampleIndex  = 0;
     m_sampleCount  = count;
     m_sampleBuffer = buffer;
+
+    std::for_each(m_chips.begin(), m_chips.end(), [muted = !buffer](sidemu* s) { s->mute(muted); });
 
     m_wait = false;
 }

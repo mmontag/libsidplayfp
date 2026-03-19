@@ -71,6 +71,8 @@ protected:
     bool m_status = true;
     bool isLocked = false;
 
+    bool m_muted = false;
+
     bool isFilterDisabled = false;
 
     /// Flags for muted voices
@@ -86,11 +88,17 @@ protected:
 public:
     sidemu(sidbuilder *builder) :
         m_builder(builder),
+        m_muted(false),
         m_error("N/A")
     {
         isMuted.reset();
     }
     ~sidemu() override = default;
+
+    /**
+     * Mute/unmute all voices.
+     */
+    virtual void mute(bool muted) { m_muted = muted; }
 
     /**
      * Clock the SID chip.

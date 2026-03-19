@@ -331,28 +331,36 @@ int SID::clock(unsigned int cycles, short* buf)
 
         if (likely(delta_t > 0))
         {
-            for (unsigned int i = 0; i < delta_t; i++)
+            if (buf)
             {
-                // clock waveform generators
-                voice[0].wave()->clock();
-                voice[1].wave()->clock();
-                voice[2].wave()->clock();
-
-                // clock envelope generators
-                voice[0].envelope()->clock();
-                voice[1].envelope()->clock();
-                voice[2].envelope()->clock();
-
-                const int sidOutput = static_cast<int>(filter->clock(voice[0], voice[1], voice[2]));
-                const int c64Output = externalFilter.clock(sidOutput + INT16_MIN);
-                if (unlikely(resampler->input(c64Output)))
+                for (unsigned int i = 0; i < delta_t; i++)
                 {
-                    buf[s++] = resampler->getOutput(scaleFactor);
-                }
-            }
+                    // clock waveform generators
+                    voice[0].wave()->clock();
+                    voice[1].wave()->clock();
+                    voice[2].wave()->clock();
 
-            cycles -= delta_t;
-            nextVoiceSync -= delta_t;
+                    // clock envelope generators
+                    voice[0].envelope()->clock();
+                    voice[1].envelope()->clock();
+                    voice[2].envelope()->clock();
+
+                    const int sidOutput = static_cast<int>(filter->clock(voice[0], voice[1], voice[2]));
+                    const int c64Output = externalFilter.clock(sidOutput + INT16_MIN);
+                    if (unlikely(resampler->input(c64Output)))
+                    {
+                        buf[s++] = resampler->getOutput(scaleFactor);
+                    }
+                }
+
+                cycles -= delta_t;
+                nextVoiceSync -= delta_t;
+            }
+            else
+            {
+                clockSilent(cycles);
+                cycles = 0;
+            }
         }
 
         if (unlikely(nextVoiceSync == 0))
