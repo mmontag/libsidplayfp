@@ -78,6 +78,9 @@ bool sidemu::lock(EventScheduler *scheduler)
     isLocked  = true;
     eventScheduler = scheduler;
 
+    m_sidTime = 0.0;
+    m_lastSystemTime = eventScheduler->getTime(EVENT_CLOCK_PHI1);
+
     return true;
 }
 
@@ -85,6 +88,20 @@ void sidemu::unlock()
 {
     isLocked  = false;
     eventScheduler = nullptr;
+}
+
+event_clock_t sidemu::getDeltaCycles()
+{
+    const event_clock_t currentSystemTime = eventScheduler->getTime(EVENT_CLOCK_PHI1);
+    const event_clock_t deltaSystem = currentSystemTime - m_lastSystemTime;
+    m_lastSystemTime = currentSystemTime;
+
+    m_sidTime += deltaSystem / m_tempo;
+
+    const event_clock_t deltaSid = static_cast<event_clock_t>(m_sidTime);
+    m_sidTime -= deltaSid;
+
+    return deltaSid;
 }
 
 }

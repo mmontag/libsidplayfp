@@ -93,11 +93,9 @@ void ReSID::write(uint_least8_t addr, uint8_t data)
 
 void ReSID::clock()
 {
-    reSID::cycle_count cycles = eventScheduler->getTime(EVENT_CLOCK_PHI1) - m_accessClk;
-    m_accessClk += cycles;
+    reSID::cycle_count cycles = getDeltaCycles();
     m_bufferpos += m_sid.clock(cycles, m_muted ? nullptr : (short *) m_buffer + m_bufferpos, m_buffersize - m_bufferpos, 1);
-    // Adjust in case not all cycles have been consumed
-    m_accessClk -= cycles;
+    consumeDeltaCycles(cycles);
 }
 
 void ReSID::filter(bool enable)

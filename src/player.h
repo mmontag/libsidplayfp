@@ -143,6 +143,13 @@ public:
 
     bool fastForward(unsigned int percent);
 
+    /**
+     * Set the playback tempo.
+     *
+     * @param tempo the new tempo scale factor (1.0 = normal)
+     */
+    void setTempo(double tempo) { m_mixer.setTempo(tempo); }
+
     bool load(SidTune *tune);
 
     uint_least32_t play(short *buffer, uint_least32_t samples);

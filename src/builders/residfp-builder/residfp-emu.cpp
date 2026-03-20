@@ -100,8 +100,7 @@ void ReSIDfp::write(uint_least8_t addr, uint8_t data)
 
 void ReSIDfp::clock()
 {
-    const event_clock_t cycles = eventScheduler->getTime(EVENT_CLOCK_PHI1) - m_accessClk;
-    m_accessClk += cycles;
+    const event_clock_t cycles = getDeltaCycles();
     m_bufferpos += m_sid.clock(cycles, m_muted ? nullptr : m_buffer + m_bufferpos);
 }
 

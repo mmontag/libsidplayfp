@@ -90,6 +90,13 @@ public:
     bool fastForward(unsigned int percent);
 
     /**
+     * Set the playback tempo.
+     *
+     * @param tempo the new tempo scale factor (1.0 = normal)
+     */
+    void setTempo(double tempo);
+
+    /**
      * Load a tune.
      * Check #error for detailed message if something goes wrong.
      *

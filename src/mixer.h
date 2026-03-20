@@ -239,6 +239,13 @@ public:
     sidemu* getSid(unsigned int i) const { return (i < m_chips.size()) ? m_chips[i] : nullptr; }
 
     /**
+     * Set the playback tempo.
+     *
+     * @param tempo the new tempo scale factor (1.0 = normal)
+     */
+    void setTempo(double tempo);
+
+    /**
      * Set the fast forward ratio.
      *
      * @param ff the fast forward ratio, from 1 to 32

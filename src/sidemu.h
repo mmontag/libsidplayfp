@@ -80,10 +80,28 @@ protected:
 
     std::string m_error;
 
+    double m_tempo = 1.0;
+    double m_sidTime = 0.0;
+    event_clock_t m_lastSystemTime = 0;
+
 protected:
     virtual void write(uint_least8_t addr, uint8_t data) = 0;
 
     void writeReg(uint_least8_t addr, uint8_t data) override final;
+
+    /**
+     * Get the number of SID cycles to clock based on the elapsed system cycles and the current tempo.
+     *
+     * @return the number of SID cycles to clock
+     */
+    event_clock_t getDeltaCycles();
+
+    /**
+     * Put unconsumed SID cycles back into the fractional cycle accumulator.
+     *
+     * @param remaining the number of unconsumed cycles
+     */
+    void consumeDeltaCycles(event_clock_t remaining) { m_sidTime += remaining; }
 
 public:
     sidemu(sidbuilder *builder) :
@@ -94,6 +112,13 @@ public:
         isMuted.reset();
     }
     ~sidemu() override = default;
+
+    /**
+     * Set the playback tempo.
+     *
+     * @param tempo the new tempo scale factor (1.0 = normal)
+     */
+    void setTempo(double tempo) { m_tempo = tempo; }
 
     /**
      * Mute/unmute all voices.

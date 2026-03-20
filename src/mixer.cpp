@@ -167,9 +167,15 @@ void Mixer::setStereo(bool stereo)
     }
 }
 
+void Mixer::setTempo(double tempo)
+{
+    for (sidemu *chip : m_chips)
+        chip->setTempo(tempo);
+}
+
 bool Mixer::setFastForward(int ff)
 {
-    if (ff < 1 || ff > 32)
+    if (ff < 1 || ff > 1024)
         return false;
 
     m_fastForwardFactor = ff;

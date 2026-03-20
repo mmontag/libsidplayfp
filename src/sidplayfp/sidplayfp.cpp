@@ -101,6 +101,11 @@ bool  sidplayfp::fastForward(unsigned int percent)
     return sidplayer.fastForward(percent);
 }
 
+void sidplayfp::setTempo(double tempo)
+{
+    sidplayer.setTempo(tempo);
+}
+
 void sidplayfp::mute(unsigned int sidNum, unsigned int voice, bool enable)
 {
     sidplayer.mute(sidNum, voice, enable);
