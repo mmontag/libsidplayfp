@@ -137,6 +137,8 @@ private:
     /// CPU
     MOS6510 cpu;
 
+    bool m_isSeeking = false;
+
 private:
     static double getCpuFreq(model_t model);
 
@@ -207,6 +209,8 @@ public:
 
     void reset();
     void resetCpu() { cpu.reset(); }
+
+    void setSeeking(bool seeking);
 
     /**
      * Set the c64 model.

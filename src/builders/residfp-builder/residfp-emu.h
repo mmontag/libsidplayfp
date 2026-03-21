@@ -61,6 +61,8 @@ public:
     // Standard SID emu functions
     void clock() override;
 
+    void setSeeking(bool seeking) override;
+
     void sampling(float systemclock, float freq,
         SidConfig::sampling_method_t method, bool) override;
 

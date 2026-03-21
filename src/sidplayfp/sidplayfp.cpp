@@ -101,6 +101,11 @@ bool  sidplayfp::fastForward(unsigned int percent)
     return sidplayer.fastForward(percent);
 }
 
+void sidplayfp::seek(uint_least32_t ms)
+{
+    sidplayer.seek(ms);
+}
+
 void sidplayfp::setTempo(double tempo)
 {
     sidplayer.setTempo(tempo);

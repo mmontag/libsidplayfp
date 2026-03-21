@@ -62,9 +62,64 @@ void StaticFuncWrapper(MOS6510& self)
  */
 void MOS6510::eventWithoutSteals()
 {
+//    if (m_isSeeking)
+//    {
+//        const event_clock_t nextEvent = eventScheduler.nextEventTime();
+//        const event_clock_t startT = eventScheduler.getTime();
+//        event_clock_t t = startT;
+//        // Batch until next event. Each CPU cycle is 2 clock ticks.
+//        while (t + 2 < nextEvent)
+//        {
+//            const ProcessorCycle &instr = instrTable[cycleCount++];
+//            (instr.func)(*this);
+//            t += 2;
+//        }
+//        eventScheduler.advanceTime(t - startT);
+//    }
+//    else
+//    {
+//        const ProcessorCycle &instr = instrTable[cycleCount++];
+//        (instr.func)(*this);
+//    }
+//    eventScheduler.schedule(m_nosteal, 1);
+  if (m_isSeeking)
+  {
+    // 1. Find the next event that is NOT this CPU's own 'nosteal' tick.
+    // We assume your scheduler can provide the time of the next peripheral event.
+    const event_clock_t nextHardwareEvent = eventScheduler.nextEventTime();
+    const event_clock_t startT = eventScheduler.getTime();
+    event_clock_t t = startT;
+
+    // 2. Batch instructions until we hit the next hardware event.
+    // We use a larger safety margin (e.g., 8 ticks) to ensure we don't
+    // overshoot an instruction boundary.
+    if (nextHardwareEvent != ~static_cast<event_clock_t>(0))
+    {
+        while (t + 8 < nextHardwareEvent)
+        {
+            const ProcessorCycle &instr = instrTable[cycleCount++];
+            (instr.func)(*this);
+            t += 2; // Each CPU cycle is 2 clock ticks
+        }
+    }
+
+    // 3. Advance the system clock by the amount we just processed.
+    event_clock_t delta = t - startT;
+    eventScheduler.advanceTime(delta);
+
+    // 4. THE SPEED HACK: Instead of scheduling for 1 cycle,
+    // schedule for the remaining distance to the next event.
+    // This prevents the scheduler from calling this function again until needed.
+    event_clock_t delay = (nextHardwareEvent > t) ? (nextHardwareEvent - t) : 1;
+    eventScheduler.schedule(m_nosteal, (delay + 1) >> 1);
+  }
+  else
+  {
+    // Original cycle-accurate path for playback
     const ProcessorCycle &instr = instrTable[cycleCount++];
     (instr.func)(*this);
     eventScheduler.schedule(m_nosteal, 1);
+  }
 }
 
 /**
@@ -72,6 +127,11 @@ void MOS6510::eventWithoutSteals()
  */
 void MOS6510::eventWithSteals()
 {
+    if (m_isSeeking) {
+        // Force the "No Steal" behavior during seek
+        eventWithoutSteals();
+        return;
+    }
     if (instrTable[cycleCount].nosteal)
     {
         const ProcessorCycle &instr = instrTable[cycleCount++];
@@ -2174,6 +2234,7 @@ void MOS6510::Initialise()
     // Signals
     rdy = true;
     d1x1 = false;
+    m_isSeeking = false;
 
     eventScheduler.schedule(m_nosteal, 0, EVENT_CLOCK_PHI2);
 }

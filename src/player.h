@@ -89,6 +89,8 @@ private:
     /// PAL/NTSC switch value
     uint8_t videoSwitch;
 
+    bool m_isSeeking = false;
+
 private:
     /**
      * Get the C64 model for the current loaded tune.
@@ -161,6 +163,8 @@ public:
     bool isPlaying() const { return m_isPlaying != state_t::STOPPED; }
 
     void stop();
+
+    void seek(uint_least32_t ms);
 
     uint_least32_t timeMs() const { return m_c64.getTimeMs() - m_startTime; }
 

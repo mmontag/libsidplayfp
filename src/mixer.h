@@ -113,6 +113,8 @@ private:
 
     bool m_wait = false;
 
+    bool m_isSeeking = false;
+
     randomLCG<VOLUME_MAX> m_rand;
 
 private:
@@ -267,6 +269,11 @@ public:
      * @param stereo true for stereo mode, false for mono
      */
     void setStereo(bool stereo);
+
+    /**
+     * Set seeking mode.
+     */
+    void setSeeking(bool seeking);
 
     /**
      * Set sample rate.

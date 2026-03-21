@@ -168,6 +168,12 @@ public:
     event_phase_t phase() const { return static_cast<event_phase_t>(currentTime & 1); }
 
     event_clock_t remaining(Event &event) const { return event.triggerTime - currentTime; }
+
+    event_clock_t nextEventTime() const { return (firstEvent != nullptr) ? firstEvent->triggerTime : ~static_cast<event_clock_t>(0); }
+
+    event_clock_t getTime() const { return currentTime; }
+
+    void advanceTime(event_clock_t dt) { currentTime += dt; }
 };
 
 }

@@ -81,21 +81,47 @@ void ReSID::reset(uint8_t volume)
 
 uint8_t ReSID::read(uint_least8_t addr)
 {
-    clock();
+    if (!m_isSeeking) clock();
     return m_sid.read(addr);
 }
 
 void ReSID::write(uint_least8_t addr, uint8_t data)
 {
-    clock();
-    m_sid.write(addr, data);
+    if (m_isSeeking)
+    {
+        m_sid.write(addr, data);
+    }
+    else
+    {
+        clock();
+        m_sid.write(addr, data);
+    }
 }
 
 void ReSID::clock()
 {
     reSID::cycle_count cycles = getDeltaCycles();
+    if (m_isSeeking) {
+      // OPTIONAL: If your 6502 needs to track 'absolute' cycles,
+      // you can just consume them here without telling the SID.
+      consumeDeltaCycles(cycles);
+      return;
+    }
     m_bufferpos += m_sid.clock(cycles, m_muted ? nullptr : (short *) m_buffer + m_bufferpos, m_buffersize - m_bufferpos, 1);
     consumeDeltaCycles(cycles);
+}
+
+void ReSID::setSeeking(bool seeking)
+{
+    if (m_isSeeking && !seeking)
+    {
+//        reSID::cycle_count cycles = getDeltaCycles();
+//        m_sid.clock(cycles, nullptr, 0);
+      // Tell the SID to instantly align its internal counters
+      // to the current 6502 cycle count without iterating.
+      m_sid.sync_silently(getDeltaCycles());
+    }
+    m_isSeeking = seeking;
 }
 
 void ReSID::filter(bool enable)

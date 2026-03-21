@@ -88,20 +88,38 @@ void ReSIDfp::reset(uint8_t volume)
 
 uint8_t ReSIDfp::read(uint_least8_t addr)
 {
-    clock();
+    if (!m_isSeeking) clock();
     return m_sid.read(addr);
 }
 
 void ReSIDfp::write(uint_least8_t addr, uint8_t data)
 {
-    clock();
-    m_sid.write(addr, data);
+    if (m_isSeeking)
+    {
+        m_sid.write(addr, data);
+    }
+    else
+    {
+        clock();
+        m_sid.write(addr, data);
+    }
 }
 
 void ReSIDfp::clock()
 {
+    if (m_isSeeking) return;
     const event_clock_t cycles = getDeltaCycles();
     m_bufferpos += m_sid.clock(cycles, m_muted ? nullptr : m_buffer + m_bufferpos);
+}
+
+void ReSIDfp::setSeeking(bool seeking)
+{
+    if (m_isSeeking && !seeking)
+    {
+        const event_clock_t cycles = getDeltaCycles();
+        m_sid.clock(cycles, nullptr);
+    }
+    m_isSeeking = seeking;
 }
 
 void ReSIDfp::filter(bool enable)

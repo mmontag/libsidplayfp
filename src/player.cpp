@@ -373,6 +373,43 @@ void Player::stop()
     }
 }
 
+void Player::seek(uint_least32_t ms)
+{
+    if (ms < timeMs())
+    {
+        state_t oldState = m_isPlaying;
+        initialise();
+        m_isPlaying = oldState;
+
+        // Prime the system with some normal cycles to ensure all chips are scheduled
+        for (int i = 0; i < 1000; i++)
+            m_c64.clock();
+    }
+
+    m_isSeeking = true;
+    m_c64.setSeeking(true);
+    m_mixer.setSeeking(true);
+
+    try
+    {
+        while (timeMs() < ms)
+        {
+            m_c64.clock();
+        }
+    }
+    catch (MOS6510::haltInstruction const &)
+    {
+        m_errorString = "Illegal instruction executed during seek";
+    }
+
+    m_isSeeking = false;
+    m_c64.setSeeking(false);
+    m_mixer.setSeeking(false);
+
+    // Synchronize chips
+    m_mixer.clockChips();
+}
+
 c64::cia_model_t getCiaModel(SidConfig::cia_model_t model)
 {
     switch (model)

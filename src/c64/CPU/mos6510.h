@@ -126,6 +126,8 @@ private:
     /// RDY pin state (stop CPU on read)
     bool rdy;
 
+    bool m_isSeeking = false;
+
     /// Address Low summer carry
     bool adl_carry;
 
@@ -322,6 +324,8 @@ public:
 
     void debug(bool enable, FILE *out);
     void setRDY(bool newRDY);
+
+    void setSeeking(bool seeking) { m_isSeeking = seeking; }
 
     // Non-standard functions
     void triggerRST();

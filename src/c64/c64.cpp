@@ -128,6 +128,14 @@ void c64::reset()
 
     irqCount = 0;
     oldBAState = true;
+    m_isSeeking = false;
+}
+
+void c64::setSeeking(bool seeking)
+{
+    m_isSeeking = seeking;
+    cpu.setSeeking(seeking);
+    vic.setSeeking(seeking);
 }
 
 void c64::setModel(model_t model)

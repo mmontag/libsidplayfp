@@ -134,6 +134,8 @@ private:
     /// the 8 sprites data
     Sprites sprites;
 
+    bool m_isSeeking = false;
+
     EventCallback<MOS656X> badLineStateChangeEvent;
 
     EventCallback<MOS656X> rasterYIRQEdgeDetectorEvent;
@@ -350,6 +352,8 @@ public:
      * Trigger the lightpen. Sets the lightpen usage flag.
      */
     void triggerLightpen();
+
+    void setSeeking(bool seeking) { m_isSeeking = seeking; }
 
     /**
      * Clears the lightpen usage flag.

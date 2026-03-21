@@ -90,6 +90,14 @@ public:
     bool fastForward(unsigned int percent);
 
     /**
+     * Set the playback time.
+     *
+     * @param ms the new time in milliseconds
+     * @since 2.15
+     */
+    void seek(uint_least32_t ms);
+
+    /**
      * Set the playback tempo.
      *
      * @param tempo the new tempo scale factor (1.0 = normal)

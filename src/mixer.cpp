@@ -34,6 +34,7 @@ namespace libsidplayfp
 
 void Mixer::clockChips()
 {
+    if (m_isSeeking) return;
     for (sidemu* chip: m_chips)
         chip->clock();
 }
@@ -46,6 +47,7 @@ void Mixer::resetBufs()
 
 void Mixer::doMix()
 {
+    if (m_isSeeking) return;
     short *outputBuffer = m_sampleBuffer + m_sampleIndex;
 
     // extract buffer info now that the SID is updated.
@@ -165,6 +167,13 @@ void Mixer::setStereo(bool stereo)
 
         updateParams();
     }
+}
+
+void Mixer::setSeeking(bool seeking)
+{
+    m_isSeeking = seeking;
+    for (sidemu *chip : m_chips)
+        chip->setSeeking(seeking);
 }
 
 void Mixer::setTempo(double tempo)

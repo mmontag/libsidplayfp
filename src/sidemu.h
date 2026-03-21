@@ -80,6 +80,8 @@ protected:
 
     std::string m_error;
 
+    bool m_isSeeking = false;
+
     double m_tempo = 1.0;
     double m_sidTime = 0.0;
     event_clock_t m_lastSystemTime = 0;
@@ -119,6 +121,8 @@ public:
      * @param tempo the new tempo scale factor (1.0 = normal)
      */
     void setTempo(double tempo) { m_tempo = tempo; }
+
+    virtual void setSeeking(bool seeking) { m_isSeeking = seeking; }
 
     /**
      * Mute/unmute all voices.

@@ -89,6 +89,7 @@ void MOS656X::reset()
     rasterClk           = 0;
     vblanking           = false;
     lpAsserted          = false;
+    m_isSeeking         = false;
 
     std::fill(std::begin(regs), std::end(regs), 0);
 
@@ -266,6 +267,48 @@ void MOS656X::handleIrqState()
 
 void MOS656X::event()
 {
+//    if (m_isSeeking)
+//    {
+//        const event_clock_t cycles = eventScheduler.getTime(eventScheduler.phase()) - rasterClk;
+//        if (cycles)
+//        {
+//            rasterClk += cycles;
+//            lineCycle += cycles;
+//            while (lineCycle >= cyclesPerLine)
+//            {
+//                lineCycle -= cyclesPerLine;
+//                rasterY++;
+//                if (rasterY >= maxRasters)
+//                    rasterY = 0;
+//                rasterYIRQEdgeDetector();
+//            }
+//        }
+//        setBA(true);
+//        eventScheduler.schedule(*this, 1, EVENT_CLOCK_PHI1);
+//        return;
+//    }
+    if (m_isSeeking)
+    {
+      const event_clock_t cycles = eventScheduler.getTime(eventScheduler.phase()) - rasterClk;
+      if (cycles)
+      {
+        rasterClk += cycles;
+        lineCycle += cycles;
+        while (lineCycle >= cyclesPerLine)
+        {
+          lineCycle -= cyclesPerLine;
+          rasterY++;
+          if (rasterY >= maxRasters) rasterY = 0;
+          rasterYIRQEdgeDetector();
+        }
+      }
+
+      // SPEED HACK: Sleep until the end of the current raster line
+      event_clock_t cyclesToNextLine = (cyclesPerLine > lineCycle) ? (cyclesPerLine - lineCycle) : 1;
+      setBA(true);
+      eventScheduler.schedule(*this, cyclesToNextLine, EVENT_CLOCK_PHI1);
+      return;
+    }
     const event_clock_t cycles = eventScheduler.getTime(eventScheduler.phase()) - rasterClk;
 
     event_clock_t delay;
