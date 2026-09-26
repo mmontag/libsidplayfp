@@ -84,6 +84,12 @@ void ReSIDfp::reset(uint8_t volume)
     m_accessClk = 0;
     m_sid.reset();
     m_sid.write(0x18, volume);
+
+    if (isLocked)
+    {
+        m_lastSystemTime = eventScheduler->getTime(EVENT_CLOCK_PHI1);
+        m_sidTime = 0.0;
+    }
 }
 
 uint8_t ReSIDfp::read(uint_least8_t addr)

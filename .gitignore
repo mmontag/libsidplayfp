@@ -30,3 +30,7 @@ tests/*.exe
 tests/*.log
 tests/*.trs
 libsidplayfp-*.tar.gz
+*~
+a.out.*
+a.wasm
+src/psiddrv.bin

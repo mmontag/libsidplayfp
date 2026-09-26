@@ -3,4 +3,5 @@
 	url = https://github.com/libsidplayfp/exsid-driver.git
 [submodule "src/builders/resid-builder/resid"]
 	path = src/builders/resid-builder/resid
-	url = https://github.com/libsidplayfp/resid.git
+	url = https://github.com/mmontag/resid.git
+	branch = montag-dev

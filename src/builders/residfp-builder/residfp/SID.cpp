@@ -509,13 +509,13 @@ void SID::clockSilent(unsigned int cycles)
 
     while (cycles != 0)
     {
-        int delta_t = std::min(nextVoiceSync, cycles);
+        int delta_t = std::min(nextVoiceSync, (unsigned int)cycles);
 
         if (delta_t > 0)
         {
             for (int i = 0; i < delta_t; i++)
             {
-                // clock waveform generators (can affect OSC3)
+                // clock waveform generators
                 voice[0].wave()->clock();
                 voice[1].wave()->clock();
                 voice[2].wave()->clock();
@@ -524,7 +524,9 @@ void SID::clockSilent(unsigned int cycles)
                 voice[1].wave()->output();
                 voice[2].wave()->output();
 
-                // clock ENV3 only
+                // clock all envelope generators
+                voice[0].envelope()->clock();
+                voice[1].envelope()->clock();
                 voice[2].envelope()->clock();
             }
 

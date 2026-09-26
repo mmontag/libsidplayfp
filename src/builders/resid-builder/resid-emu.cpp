@@ -77,6 +77,12 @@ void ReSID::reset(uint8_t volume)
     m_accessClk = 0;
     m_sid.reset();
     m_sid.write(0x18, volume);
+
+    if (isLocked)
+    {
+        m_lastSystemTime = eventScheduler->getTime(EVENT_CLOCK_PHI1);
+        m_sidTime = 0.0;
+    }
 }
 
 uint8_t ReSID::read(uint_least8_t addr)
@@ -102,9 +108,6 @@ void ReSID::clock()
 {
     reSID::cycle_count cycles = getDeltaCycles();
     if (m_isSeeking) {
-      // OPTIONAL: If your 6502 needs to track 'absolute' cycles,
-      // you can just consume them here without telling the SID.
-      consumeDeltaCycles(cycles);
       return;
     }
     m_bufferpos += m_sid.clock(cycles, m_muted ? nullptr : (short *) m_buffer + m_bufferpos, m_buffersize - m_bufferpos, 1);

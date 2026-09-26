@@ -8,6 +8,31 @@ the reSID SID chip emulation into a cycle-based emulator
 environment, constantly aiming to improve emulation of the
 C64 system and the SID chips.
 
+-----------------------------------------------------------------------------
+
+Fork Notes (mmontag/libsidplayfp)
+---------------------------------
+
+This is Matt Montag's fork of libsidplayfp, maintained for use with
+Chip Player JS (https://github.com/mmontag/chip-player-js).
+
+Key Features & Modifications:
+- Fast seeking support (sidplayfp::seek(ms)) with headless emulation bypass.
+- Pitch-invariant playback speed / tempo control (sidplayfp::setTempo(ratio)).
+- Envelope and state synchronization improvements during silent seeking.
+
+Submodule Information:
+- The src/builders/resid-builder/resid submodule tracks the fork at:
+  https://github.com/mmontag/resid.git (branch: montag-dev)
+  which includes necessary fixes for cycle overflow and FIR buffer clearing
+  on silent sync.
+- When cloning, ensure submodules are initialized:
+    git clone --recurse-submodules -b montag-dev-2.14 https://github.com/mmontag/libsidplayfp.git
+  Or in an existing checkout:
+    git submodule update --init --recursive
+
+-----------------------------------------------------------------------------
+
 Copyright (c) 2000-2001 Simon White
 Copyright (c) 2007-2010 Antti Lankila
 Copyright (c) 2010-2025 Leandro Nini <drfiemost@users.sourceforge.net>
